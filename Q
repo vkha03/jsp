@@ -1,0 +1,84 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Đăng nhập</title>
+    <style>
+        table { border-collapse: collapse; width: 350px; border: 1px solid gray; margin: 50px auto; font-family: Arial, sans-serif; }
+        th { background-color: #ff99ff; padding: 5px; border: 1px solid gray; color: black; font-weight: bold; }
+        td { background-color: #99ffff; border: 1px solid gray; padding: 10px; font-weight: bold; }
+        .footer { background-color: white; text-align: center; padding: 5px; }
+        input[type="text"], input[type="password"] { width: 150px; }
+        .error { color: red; text-align: center; font-size: 14px; display: block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<%
+    String error = "";
+    String maSo = request.getParameter("maSo");
+    String matKhau = request.getParameter("matKhau");
+
+    if (request.getMethod().equalsIgnoreCase("POST")) {
+        if (maSo == null || maSo.trim().isEmpty() || matKhau == null || matKhau.trim().isEmpty()) {
+            error = "Vui lòng nhập vào mã số cán bộ và mật khẩu.";
+        } else {
+            Connection conn = null;
+            PreparedStatement pstmt = null;
+            ResultSet rs = null;
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/qlcanbo", "root", "");
+                
+                String sql = "SELECT * FROM canbo WHERE macanbo = ? AND matkhau = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, maSo);
+                pstmt.setString(2, matKhau);
+                
+                rs = pstmt.executeQuery();
+                
+                if (rs.next()) {
+                    session.setAttribute("user", maSo);
+                    response.sendRedirect("edit_profile.jsp");
+                    return; 
+                } else {
+                    error = "Mã số cán bộ hoặc mật khẩu không chính xác.";
+                }
+            } catch (Exception e) {
+                error = "Lỗi hệ thống: " + e.getMessage();
+            } finally {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            }
+        }
+    }
+%>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <% if (!error.isEmpty()) { %>
+            <span class="error"><%= error %></span>
+        <% } %>
+    </div>
+
+    <form method="POST">
+        <table>
+            <tr><th colspan="2">ĐĂNG NHẬP</th></tr>
+            <tr>
+                <td>Mã số cán bộ:</td>
+                <td><input type="text" name="maSo" value="<%= (maSo != null) ? maSo : "4300S382" %>"></td>
+            </tr>
+            <tr>
+                <td>Mật khẩu:</td>
+                <td><input type="password" name="matKhau"></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="footer">
+                    <input type="submit" value="Đăng nhập">
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
