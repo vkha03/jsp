@@ -1,0 +1,68 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Đăng nhập</title>
+    <style>
+        table { border-collapse: collapse; width: 350px; border: 1px solid gray; margin: 50px auto; font-family: Arial, sans-serif; }
+        th { background-color: #ff99ff; padding: 5px; border: 1px solid gray; color: black; font-weight: bold; }
+        td { background-color: #99ffff; border: 1px solid gray; padding: 10px; font-weight: bold; }
+        .footer { background-color: white; text-align: center; padding: 5px; }
+        input[type="text"], input[type="password"] { width: 150px; }
+    </style>
+</head>
+<body>
+
+<%
+    String maSo = request.getParameter("maSo");
+    String matKhau = request.getParameter("matKhau");
+    String btn = request.getParameter("login");
+
+    if (btn != null) {
+        if (maSo == null || maSo.trim().isEmpty() || matKhau == null || matKhau.trim().isEmpty()) {
+            out.println("<script>alert('Vui lòng nhập vào mã số cán bộ và mật khẩu.');</script>");
+        } else {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/qlcanbo", "root", "");
+            Statement stmt = conn.createStatement();
+            
+            String sql = "SELECT * FROM canbo WHERE macanbo = '" + maSo + "' AND matkhau = '" + matKhau + "'";
+            ResultSet rs = stmt.executeQuery(sql);
+            
+            if (rs.next()) {
+                out.println("<script>");
+                out.println("alert('Đăng nhập thành công!');");
+                out.println("window.location.href='edit_profile.jsp?id=" + maSo + "';");
+                out.println("</script>");
+            } else {
+                out.println("<script>alert('Mã số cán bộ hoặc mật khẩu không chính xác.');</script>");
+            }
+            
+            rs.close();
+            stmt.close();
+            conn.close();
+        }
+    }
+%>
+
+    <form method="POST">
+        <table>
+            <tr><th colspan="2">ĐĂNG NHẬP</th></tr>
+            <tr>
+                <td>Mã số cán bộ:</td>
+                <td><input type="text" name="maSo" value="4300S382"></td>
+            </tr>
+            <tr>
+                <td>Mật khẩu:</td>
+                <td><input type="password" name="matKhau"></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="footer">
+                    <input type="submit" name="login" value="Đăng nhập">
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
