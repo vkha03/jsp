@@ -1,0 +1,14 @@
+CREATE DATABASE IF NOT EXISTS QuanLySinhVien;
+USE QuanLySinhVien;
+
+CREATE TABLE IF NOT EXISTS sinhvien (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    maSV VARCHAR(20) NOT NULL,
+    tenSV VARCHAR(50) NOT NULL,
+    lop VARCHAR(20)
+);
+
+INSERT INTO sinhvien (maSV, tenSV, lop) VALUES 
+('SV001', 'Nguyen Van A', 'IT01'),
+('SV002', 'Tran Thi B', 'IT02'),
+('SV003', 'Le Van C', 'IT01');
